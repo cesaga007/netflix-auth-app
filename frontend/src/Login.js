@@ -1,7 +1,8 @@
+// src/Login.js
 import React, { useState } from 'react';
 import axios from 'axios';
 
-const Login = () => {
+const Login = ({ setToken }) => {
   const [isRegistering, setIsRegistering] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -9,17 +10,22 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     const url = isRegistering
-      ? 'http://localhost:8000/api/register/'
-      : 'http://localhost:8000/api/login/';
+      ? 'http://localhost:8000/api/register/' // endpoint para registro
+      : 'http://localhost:8000/api/login/';   // endpoint para login
 
     try {
-      const response = await axios.post(url, { username, password });
+      const response = await axios.post(url, {
+        username,
+        password
+      });
+
       if (isRegistering) {
         setMessage('Registro exitoso. Ahora puedes iniciar sesión.');
       } else {
         setMessage('Inicio de sesión exitoso.');
-        console.log('Token recibido:', response.data);
+        setToken(response.data.access); // Guarda el token JWT recibido
       }
     } catch (error) {
       setMessage('Hubo un error. Verifica tus datos.');
@@ -36,12 +42,14 @@ const Login = () => {
           placeholder="Usuario"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
+          required
         />
         <input
           type="password"
           placeholder="Contraseña"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          required
         />
         <button type="submit">
           {isRegistering ? 'Registrarse' : 'Ingresar'}
